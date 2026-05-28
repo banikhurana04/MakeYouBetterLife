@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MakeYouBetter - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  </head>
+  <body class="font-sans bg-gradient-to-br from-slate-950 via-slate-900 to-purple-950 min-h-screen overflow-x-hidden">
+    <!-- Background glow -->
+    <div class="relative">
+      <div class="glow-orb a"></div>
+      <div class="glow-orb b"></div>
+      <div class="glow-orb c"></div>
+
+      <header class="relative z-10 px-8 pt-8 flex items-center justify-between">
+        <div class="text-white">
+          <div class="text-2xl font-bold tracking-tight">MakeYouBetter</div>
+          <p class="text-slate-400 text-sm mt-1">Productive wellness, logged daily.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="top-user-name" class="text-slate-300 text-sm font-medium"></span>
+          <button
+            id="logout-btn"
+            class="px-4 py-2 glass-panel rounded-xl border border-slate-700/60 text-slate-200 shadow-glow transition-all"
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <main class="relative z-10 px-8 pb-14 pt-10">
+        <div class="flex gap-8 items-start">
+          <!-- LEFT PANEL (30%) -->
+          <aside class="w-[30%] min-w-[280px] flex flex-col gap-6">
+            <section class="glass-panel rounded-2xl p-7 border border-slate-700/50">
+              <h2 class="text-white text-3xl font-bold leading-tight">
+                Hi, <span id="user-name">—</span>
+              </h2>
+              <p class="text-slate-400 mt-2">A small daily ritual beats a perfect plan.</p>
+            </section>
+
+            <section class="glass-panel rounded-2xl p-7 border border-slate-700/50">
+              <div class="flex items-end justify-between mb-5">
+                <h3 class="text-slate-200 text-lg font-semibold">Quick stats</h3>
+                <span class="text-xs text-slate-500">Last 30 days</span>
+              </div>
+
+              <div class="space-y-4">
+                <div class="flex items-baseline justify-between">
+                  <span class="text-slate-400 text-sm">Total entries</span>
+                  <span id="stat-total-habits" class="text-white text-3xl font-bold">0</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                  <span class="text-slate-400 text-sm">Completed today</span>
+                  <span id="stat-completed-today" class="text-white text-3xl font-bold">0</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                  <span class="text-slate-400 text-sm">Streak days</span>
+                  <span id="stat-streak" class="text-purple-300 text-3xl font-bold">0</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="glass-panel rounded-2xl p-7 border border-slate-700/50 flex flex-col gap-4">
+              <h3 class="text-slate-200 text-lg font-semibold">Today’s cue</h3>
+              <div class="text-white text-2xl font-semibold leading-snug">
+                <span class="text-pink-200">Momentum</span>
+                starts when you log the first thing.
+              </div>
+              <div class="text-slate-400 text-sm">
+                Habit tracking is your external memory.
+              </div>
+            </section>
+
+            <section class="glass-panel rounded-2xl p-7 border border-slate-700/50">
+              <h3 class="text-slate-200 text-lg font-semibold mb-3">Your preferences</h3>
+              <div class="space-y-3 text-sm">
+                <div>
+                  <span class="text-slate-500">Goal:</span>
+                  <span id="pref-goal" class="text-slate-200 ml-2">—</span>
+                </div>
+                <div>
+                  <span class="text-slate-500">Skin:</span>
+                  <span id="pref-skin" class="text-slate-200 ml-2">—</span>
+                </div>
+                <div>
+                  <span class="text-slate-500">Style:</span>
+                  <span id="pref-style" class="text-slate-200 ml-2">—</span>
+                </div>
+              </div>
+            </section>
+          </aside>
+
+          <!-- RIGHT PANEL (70%) -->
+          <section class="w-[70%] flex flex-col gap-6">
+            <!-- Daily Goals -->
+            <section class="glass-panel rounded-2xl p-7 border border-slate-700/50">
+              <div class="flex items-end justify-between mb-5">
+                <div>
+                  <h3 class="text-white text-xl font-bold">Daily Goals</h3>
+                  <p class="text-slate-400 text-sm mt-1">Set targets, track progress, and get smart reminders.</p>
+                </div>
+                <span class="text-xs text-slate-500">New</span>
+              </div>
+
+              <form id="goals-form" class="grid grid-cols-12 gap-4">
+                <div class="col-span-12 sm:col-span-2">
+                  <label class="text-slate-400 text-sm">Water Goal (L)</label>
+                  <input id="water-goal" type="number" min="0.5" step="0.1" class="mt-2 w-full glass-border bg-slate-950/30 px-3 py-2 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+                <div class="col-span-12 sm:col-span-2">
+                  <label class="text-slate-400 text-sm">Sleep Goal (hrs)</label>
+                  <input id="sleep-goal" type="number" min="1" step="0.5" class="mt-2 w-full glass-border bg-slate-950/30 px-3 py-2 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+                <div class="col-span-12 sm:col-span-2">
+                  <label class="text-slate-400 text-sm">Exercise Goal (min)</label>
+                  <input id="exercise-goal" type="number" min="5" step="5" class="mt-2 w-full glass-border bg-slate-950/30 px-3 py-2 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+                <div class="col-span-12 sm:col-span-2">
+                  <label class="text-slate-400 text-sm">Wake Time</label>
+                  <input id="wake-time" type="time" class="mt-2 w-full glass-border bg-slate-950/30 px-3 py-2 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+                <div class="col-span-12 sm:col-span-2">
+                  <label class="text-slate-400 text-sm">Sleep Time</label>
+                  <input id="sleep-time" type="time" class="mt-2 w-full glass-border bg-slate-950/30 px-3 py-2 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400" />
+                </div>
+                <div class="col-span-12 sm:col-span-2 flex items-end">
+                  <button type="submit" class="w-full px-4 py-2 rounded-xl text-white font-semibold bg-gradient-to-r from-purple-600 to-pink-600 shadow-glow transition-all">Save Goals</button>
+                </div>
+              </form>
+
+              <div id="goals-message" class="message mt-4 hidden"></div>
+
+              <div class="mt-6 grid grid-cols-12 gap-4">
+                <div class="col-span-12 sm:col-span-4">
+                  <div class="text-slate-400 text-sm mb-2">Water Progress <span id="water-progress-label" class="text-slate-200"></span></div>
+                  <div class="w-full h-3 rounded-full bg-slate-800/80 overflow-hidden">
+                    <div id="water-progress-bar" class="h-full bg-pink-400 transition-all" style="width: 0%"></div>
+                  </div>
+                </div>
+                <div class="col-span-12 sm:col-span-4">
+                  <div class="text-slate-400 text-sm mb-2">Sleep Progress <span id="sleep-progress-label" class="text-slate-200"></span></div>
+                  <div class="w-full h-3 rounded-full bg-slate-800/80 overflow-hidden">
+                    <div id="sleep-progress-bar" class="h-full bg-purple-400 transition-all" style="width: 0%"></div>
+                  </div>
+                </div>
+                <div class="col-span-12 sm:col-span-4">
+                  <div class="text-slate-400 text-sm mb-2">Exercise Progress <span id="exercise-progress-label" class="text-slate-200"></span></div>
+                  <div class="w-full h-3 rounded-full bg-slate-800/80 overflow-hidden">
+                    <div id="exercise-progress-bar" class="h-full bg-blue-400 transition-all" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="reminder-message" class="mt-5 text-sm text-amber-200"></div>
+            </section>
+
+            <!-- Habit form -->
+            <section class="glass-panel rounded-2xl p-7 border border-slate-700/50">
+              <div class="flex items-start justify-between gap-6 mb-5">
+                <div>
+                  <h2 class="text-white text-2xl font-bold">Log your day</h2>
+                  <p class="text-slate-400 text-sm mt-1">Sleep, water, meals, exercise. One date at a time.</p>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs text-slate-500">Tip</div>
+                  <div class="text-slate-200 text-sm font-medium">You can update existing entries.</div>
+                </div>
+              </div>
+
+              <form id="habit-form" class="grid grid-cols-12 gap-4">
+                <div class="col-span-12 sm:col-span-4">
+                  <label class="text-slate-400 text-sm">Date</label>
+                  <input
+                    id="habit-date"
+                    type="date"
+                    required
+                    class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-purple-400 outline-none"
+                  />
+                </div>
+
+                <div class="col-span-12 sm:col-span-4">
+                  <label class="text-slate-400 text-sm">Sleep hours</label>
+                  <input
+                    id="sleep-hours"
+                    type="number"
+                    min="0"
+                    step="0.25"
+                    placeholder="e.g. 7.5"
+                    class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-purple-400 outline-none"
+                  />
+                </div>
+
+                <div class="col-span-12 sm:col-span-4">
+                  <label class="text-slate-400 text-sm">Water intake</label>
+                  <input
+                    id="water-intake"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="e.g. 2.0 cups"
+                    class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-purple-400 outline-none"
+                  />
+                </div>
+
+                <div class="col-span-12 sm:col-span-4">
+                  <label class="text-slate-400 text-sm">Meals</label>
+                  <input
+                    id="meals"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="e.g. 3"
+                    class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-purple-400 outline-none"
+                  />
+                </div>
+
+                <div class="col-span-12 sm:col-span-4">
+                  <label class="text-slate-400 text-sm">Exercise minutes</label>
+                  <input
+                    id="exercise-minutes"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="e.g. 30"
+                    class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-purple-400 outline-none"
+                  />
+                </div>
+
+                <div class="col-span-12 sm:col-span-4 flex items-end">
+                  <button
+                    id="habit-submit-btn"
+                    type="submit"
+                    class="w-full px-5 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-purple-600 to-pink-600 shadow-glow transition-all transform hover:scale-[1.01]"
+                  >
+                    Save entry
+                  </button>
+                </div>
+              </form>
+
+              <div id="habit-message" class="message mt-4 hidden"></div>
+            </section>
+
+            <!-- Habit list -->
+            <section class="glass-panel rounded-2xl p-7 border border-slate-700/50">
+              <div class="flex items-end justify-between mb-4">
+                <div>
+                  <h3 class="text-white text-xl font-bold">Your recent logs</h3>
+                  <p id="logs-subtitle" class="text-slate-400 text-sm mt-1">Showing today (or your latest entry).</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <button
+                    id="toggle-history-btn"
+                    type="button"
+                    class="px-4 py-2 rounded-xl border border-slate-700/60 text-slate-200 bg-slate-950/20 shadow-glow hover:text-white transition-all text-sm"
+                  >
+                    View history
+                  </button>
+                  <select
+                    id="history-range"
+                    class="hidden px-3 py-2 rounded-xl border border-slate-700/60 text-slate-200 bg-slate-950/20 text-sm outline-none"
+                  >
+                    <option value="weekly" selected>Weekly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="habit-list" class="space-y-4"></div>
+            </section>
+
+            <!-- Summary cards + charts -->
+            <section class="flex flex-col gap-6">
+              <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-12 sm:col-span-4 glass-panel rounded-2xl p-6 border border-slate-700/50">
+                  <div class="text-slate-400 text-sm">Avg Sleep (7 days)</div>
+                  <div class="text-white text-4xl font-bold mt-2" id="avg-sleep">0</div>
+                  <div class="text-purple-300 text-sm mt-1">hours</div>
+                </div>
+                <div class="col-span-12 sm:col-span-4 glass-panel rounded-2xl p-6 border border-slate-700/50">
+                  <div class="text-slate-400 text-sm">Avg Water (7 days)</div>
+                  <div class="text-white text-4xl font-bold mt-2" id="avg-water">0</div>
+                  <div class="text-pink-200 text-sm mt-1">cups</div>
+                </div>
+                <div class="col-span-12 sm:col-span-4 glass-panel rounded-2xl p-6 border border-slate-700/50">
+                  <div class="text-slate-400 text-sm">Activity Score</div>
+                  <div class="text-white text-4xl font-bold mt-2" id="activity-score">0</div>
+                  <div class="text-slate-400 text-sm mt-1">0-100</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-12 lg:col-span-6 glass-panel rounded-2xl p-6 border border-slate-700/50">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-white text-lg font-bold">Weekly trends</h3>
+                    <span class="text-xs text-slate-500">Sleep vs Water</span>
+                  </div>
+                  <div class="relative h-64">
+                    <canvas id="weeklyChart" class="w-full h-full"></canvas>
+                  </div>
+                </div>
+                <div class="col-span-12 lg:col-span-6 glass-panel rounded-2xl p-6 border border-slate-700/50">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-white text-lg font-bold">Monthly trends</h3>
+                    <span class="text-xs text-slate-500">Sleep vs Exercise</span>
+                  </div>
+                  <div class="relative h-64">
+                    <canvas id="monthlyChart" class="w-full h-full"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI Modules Section -->
+              <div class="grid grid-cols-12 gap-4">
+                <!-- AI Mood Insights -->
+                <section class="col-span-12 lg:col-span-6 glass-panel rounded-2xl p-6 border border-slate-700/50 relative overflow-hidden group">
+                  <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div class="relative z-10">
+                    <div class="flex items-end justify-between mb-4">
+                      <div>
+                        <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                          AI Energy & Mood
+                        </h3>
+                        <p class="text-slate-400 text-sm mt-1">Predicted from your recent sleep, water, and exercise.</p>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                      <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-700/30">
+                        <div class="text-slate-400 text-sm mb-1">Energy Level</div>
+                        <div id="ai-energy-level" class="text-white text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-400">Loading...</div>
+                      </div>
+                      <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-700/30">
+                        <div class="text-slate-400 text-sm mb-1">Mood Prediction</div>
+                        <div id="ai-mood-level" class="text-white text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-rose-400">Loading...</div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Face Scan -->
+                <section class="col-span-12 lg:col-span-6 glass-panel rounded-2xl p-6 border border-slate-700/50 relative overflow-hidden group">
+                  <div class="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div class="relative z-10">
+                    <div class="flex items-end justify-between mb-4">
+                      <div>
+                        <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                          Face Skin Analysis
+                        </h3>
+                        <p class="text-slate-400 text-sm mt-1">Upload a selfie or use camera for AI acne detection.</p>
+                      </div>
+                    </div>
+
+                    <div class="flex gap-2 mb-4">
+                      <button id="tab-upload" type="button" class="px-4 py-2 rounded-lg text-sm font-medium bg-teal-500/20 text-teal-300 border border-teal-500/30 transition-all">Upload Image</button>
+                      <button id="tab-camera" type="button" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/50 text-slate-400 border border-transparent hover:text-slate-200 transition-all">Use Camera</button>
+                    </div>
+
+                    <form id="face-scan-form" class="mt-4 flex flex-col gap-3">
+                      <input type="file" id="face-image" accept="image/*" required class="text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-500/20 file:text-teal-300 hover:file:bg-teal-500/30 transition-all cursor-pointer" />
+                      <button type="submit" id="face-scan-btn" class="self-start px-5 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-teal-600 to-emerald-600 shadow-glow transition-all transform hover:scale-[1.02]">Analyze Image</button>
+                    </form>
+
+                    <div id="camera-interface" class="mt-4 flex flex-col gap-3 hidden">
+                      <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-slate-700/50">
+                        <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                        <canvas id="webcam-canvas" class="hidden"></canvas>
+                      </div>
+                      <div class="flex gap-3">
+                        <button type="button" id="start-camera-btn" class="flex-1 px-4 py-2.5 rounded-xl text-white font-semibold bg-slate-700 hover:bg-slate-600 transition-all">Start Camera</button>
+                        <button type="button" id="capture-btn" class="flex-1 px-4 py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-teal-600 to-emerald-600 shadow-glow transition-all transform hover:scale-[1.02] hidden">Capture & Analyze</button>
+                      </div>
+                    </div>
+
+                    <div id="face-scan-result" class="mt-4 text-sm font-medium text-teal-200 hidden bg-teal-900/30 p-3 rounded-xl border border-teal-500/20"></div>
+                  </div>
+                </section>
+              </div>
+
+              <!-- Phase 2: Recommendations (added, not a redesign) -->
+              <div class="grid grid-cols-12 gap-4">
+                <!-- Skin Care -->
+                <section class="col-span-12 lg:col-span-6 glass-panel rounded-2xl p-6 border border-slate-700/50">
+                  <div class="flex items-end justify-between gap-4">
+                    <div>
+                      <h3 class="text-white text-xl font-bold">Skin care</h3>
+                      <p class="text-slate-400 text-sm mt-1">Rule-based routine using your lifestyle averages.</p>
+                    </div>
+                    <div class="text-xs text-slate-500">Phase 2</div>
+                  </div>
+
+                  <form id="skincare-form" class="mt-5 space-y-4">
+                    <div class="grid grid-cols-12 gap-3">
+                      <div class="col-span-12 sm:col-span-5">
+                        <label class="text-slate-400 text-sm">Skin type</label>
+                        <select
+                          id="skin-type"
+                          class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400"
+                        >
+                          <option value="">Use profile</option>
+                          <option value="oily">Oily</option>
+                          <option value="dry">Dry</option>
+                          <option value="combination">Combination</option>
+                          <option value="sensitive">Sensitive</option>
+                        </select>
+                      </div>
+
+                      <div class="col-span-12 sm:col-span-7">
+                        <div class="text-slate-400 text-sm">Concerns (choose multiple)</div>
+                        <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
+                          <label class="flex items-center gap-2 text-slate-200">
+                            <input type="checkbox" value="acne" class="accent-purple-400" />
+                            Acne
+                          </label>
+                          <label class="flex items-center gap-2 text-slate-200">
+                            <input type="checkbox" value="pigmentation" class="accent-purple-400" />
+                            Pigmentation
+                          </label>
+                          <label class="flex items-center gap-2 text-slate-200">
+                            <input type="checkbox" value="dullness" class="accent-purple-400" />
+                            Dullness
+                          </label>
+                          <label class="flex items-center gap-2 text-slate-200">
+                            <input type="checkbox" value="aging" class="accent-purple-400" />
+                            Aging
+                          </label>
+                          <label class="flex items-center gap-2 text-slate-200">
+                            <input type="checkbox" value="dryness" class="accent-purple-400" />
+                            Dryness
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      class="px-5 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-purple-600 to-pink-600 shadow-glow transition-all transform hover:scale-[1.01]"
+                    >
+                      Get routine
+                    </button>
+                  </form>
+
+                  <div id="skincare-result" class="mt-5 text-sm text-slate-200"></div>
+                </section>
+
+                <!-- Fashion -->
+                <section class="col-span-12 lg:col-span-6 glass-panel rounded-2xl p-6 border border-slate-700/50">
+                  <div class="flex items-end justify-between gap-4">
+                    <div>
+                      <h3 class="text-white text-xl font-bold">Fashion</h3>
+                      <p class="text-slate-400 text-sm mt-1">Outfit suggestions that combine context + your style.</p>
+                    </div>
+                    <div class="text-xs text-slate-500">Phase 2</div>
+                  </div>
+
+                  <form id="fashion-form" class="mt-5 grid grid-cols-12 gap-3">
+                    <div class="col-span-12 sm:col-span-6">
+                      <label class="text-slate-400 text-sm">Occasion</label>
+                      <select
+                        id="fashion-occasion"
+                        class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400"
+                      >
+                        <option value="casual">Casual</option>
+                        <option value="formal">Formal</option>
+                        <option value="party">Party</option>
+                        <option value="date">Date</option>
+                        <option value="meeting">Meeting</option>
+                      </select>
+                    </div>
+
+                    <div class="col-span-6 sm:col-span-3">
+                      <label class="text-slate-400 text-sm">Time</label>
+                      <select
+                        id="fashion-time"
+                        class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400"
+                      >
+                        <option value="day">Day</option>
+                        <option value="night">Night</option>
+                      </select>
+                    </div>
+
+                    <div class="col-span-6 sm:col-span-3">
+                      <label class="text-slate-400 text-sm">Weather</label>
+                      <select
+                        id="fashion-weather"
+                        class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400"
+                      >
+                        <option value="moderate">Moderate</option>
+                        <option value="hot">Hot</option>
+                        <option value="cold">Cold</option>
+                      </select>
+                    </div>
+
+                    <div class="col-span-12">
+                      <label class="text-slate-400 text-sm">Style (optional)</label>
+                      <select
+                        id="fashion-style"
+                        class="mt-2 w-full glass-border bg-slate-950/30 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-400"
+                      >
+                        <option value="">Use profile</option>
+                        <option value="casual">Casual</option>
+                        <option value="formal">Formal</option>
+                        <option value="streetwear">Streetwear</option>
+                      </select>
+                    </div>
+
+                    <div class="col-span-12">
+                      <button
+                        type="submit"
+                        class="px-5 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-purple-600 to-pink-600 shadow-glow transition-all transform hover:scale-[1.01]"
+                      >
+                        Get outfit
+                      </button>
+                    </div>
+                  </form>
+
+                  <div id="fashion-result" class="mt-5 text-sm text-slate-200"></div>
+                </section>
+              </div>
+            </section>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <div id="reminder-toast" class="fixed bottom-5 right-5 hidden z-50 max-w-sm"></div>
+  </body>
+</html>
+
